@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Rykov Kombat</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            min-height: 90vh;
+            user-select: none;
+            -webkit-user-select: none;
+            overflow-x: hidden;
+        }
+        .header {
+            font-size: 26px;
+            font-weight: bold;
+            color: #ffcc00;
+            margin-top: 5px;
+        }
+        .score {
+            font-size: 48px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        .clicker-container {
+            position: relative;
+            cursor: pointer;
+            touch-action: manipulation;
+        }
+        .clicker-img {
+            width: 240px;
+            height: 240px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 5px solid #ffcc00;
+            box-shadow: 0 0 30px rgba(255, 204, 0, 0.4);
+            transition: transform 0.1s ease-out;
+            transform-origin: center center;
+        }
+        .stats {
+            font-size: 18px;
+            color: #aaaaaa;
+            margin: 10px 0;
+        }
+        /* Админ-панель для рассылки */
+        .admin-panel {
+            background: #1e1e1e;
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid #ffcc00;
+            width: 90%;
+            max-width: 320px;
+            margin-top: 10px;
+        }
+        .admin-panel input {
+            width: 85%;
+            padding: 8px;
+            border-radius: 6px;
+            border: none;
+            outline: none;
+            margin-bottom: 8px;
+            background: #2a2a2a;
+            color: #fff;
+            text-align: center;
+            font-size: 14px;
+        }
+        .admin-panel button {
+            background: #ffcc00;
+            color: #000;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">Rykov Kombat</div>
+    
+    <div class="score" id="score">0</div>
+
+    <div class="clicker-container" id="clickArea">
+        <!-- Убедись, что картинка на GitHub называется именно rykov.png -->
+        <img src="rykov.png" alt="Rykov" class="clicker-img" id="rykovImage">
+    </div>
+
+    <div class="stats">
+        ⚡ Энергия: <span id="energy">1000</span> / 1000
+    </div>
+
+    <!-- Панель администратора (для отправки рассылки через бота) -->
+    <div class="admin-panel">
+        <div style="font-size: 12px; color: #ffcc00; margin-bottom: 5px;">👑 Панель рассылки</div>
+        <input type="text" id="broadcastInput" placeholder="Текст сообщения для всех...">
+        <br>
+        <button onclick="sendBroadcast()">Отправить всем</button>
+    </div>
+
+    <script>
+        const tg = window.Telegram?.WebApp;
+        if (tg) {
+            tg.expand();
+        }
+
+        // Загружаем сохраненный счет
+        let score = parseInt(localStorage.getItem('rykov_score')) || 0;
+        let energy = 1000;
+
+        const scoreElement = document.getElementById('score');
+        const energyElement = document.getElementById('energy');
+        const clickArea = document.getElementById('clickArea');
+        const rykovImage = document.getElementById('rykovImage');
+
+        scoreElement.innerText = score;
+
+        // Клик по персонажу
+        clickArea.addEventListener('pointerdown', (e) => {
+            if (energy > 0) {
+                score += 1;
+                energy -= 1;
+                
+                scoreElement.innerText = score;
+                energyElement.innerText = energy;
+
+                localStorage.setItem('rykov_score', score);
+
+                // Эффект сжатия и поворота
+                const randomAngle = (Math.random() - 0.5) * 70; 
+                const randomX = (Math.random() - 0.5) * 20;
+                const randomY = (Math.random() - 0.5) * 20;
+
+                rykovImage.style.transform = `translate(${randomX}px, ${randomY}px) rotate(${randomAngle}deg) scale(0.9)`;
+
+                setTimeout(() => {
+                    rykovImage.style.transform = 'translate(0px, 0px) rotate(0deg) scale(1)';
+                }, 100);
+
+                showFloatingText(e.clientX, e.clientY, "+1");
+            }
+        });
+
+        // Функция отправки рассылки боту из игры
+        function sendBroadcast() {
+            const input = document.getElementById('broadcastInput');
+            const text = input.value.trim();
+            
+            if (!text) {
+                alert('Введите текст сообщения!');
+                return;
+            }
+
+            if (tg && tg.sendData) {
+                tg.sendData(text); // Передает текст в Python-бот, который сделает рассылку
+            } else {
+                alert('Функция доступна только внутри Telegram Mini App!');
+            }
+        }
+
+        // Восстановление энергии
+        setInterval(() => {
+            if (energy < 1000) {
+                energy += 3;
+                if (energy > 1000) energy = 1000;
+                energyElement.innerText = energy;
+            }
+        }, 1000);
+
+        function showFloatingText(x, y, text) {
+            const el = document.createElement('div');
+            el.innerText = text;
+            el.style.position = 'fixed';
+            el.style.left = `${x || 200}px`;
+            el.style.top = `${y || 300}px`;
+            el.style.color = '#ffcc00';
+            el.style.fontSize = '28px';
+            el.style.fontWeight = 'bold';
+            el.style.pointerEvents = 'none';
+            el.style.zIndex = '1000';
+            el.style.transition = 'transform 0.5s ease, opacity 0.5s ease';
+            document.body.appendChild(el);
+
+            setTimeout(() => {
+                el.style.transform = 'translateY(-50px)';
+                el.style.opacity = '0';
+            }, 20);
+
+            setTimeout(() => el.remove(), 500);
+        }
+    </script>
+</body>
+</html>
