@@ -62,8 +62,8 @@
     <div class="score" id="score">0</div>
 
     <div class="clicker-container" id="clickArea">
-        <!-- Установлено точное имя твоего файла изображения -->
-        <img src="rykov.jpg" alt="Rykov" class="clicker-img" id="rykovImage">
+        <!-- Указано обновленное название файла картинки -->
+        <img src="rykov.png" alt="Rykov" class="clicker-img" id="rykovImage">
     </div>
 
     <div class="stats">
@@ -86,7 +86,6 @@
 
         scoreElement.innerText = score;
 
-        // Надежное событие нажатия для телефонов и ПК
         clickArea.addEventListener('pointerdown', (e) => {
             if (energy > 0) {
                 score += 1;
@@ -108,7 +107,6 @@
                     rykovImage.style.transform = 'translate(0px, 0px) rotate(0deg) scale(1)';
                 }, 100);
 
-                // Всплывающий текст +1
                 showFloatingText(e.clientX, e.clientY, "+1");
             }
         });
@@ -126,17 +124,14 @@
             const el = document.createElement('div');
             el.innerText = text;
             el.style.position = 'fixed';
-            el.style.left = `${x}px`;
-            el.style.top = `${y}px`;
+            el.style.left = `${x || 200}px`;
+            el.style.top = `${y || 300}px`;
             el.style.color = '#ffcc00';
             el.style.fontSize = '28px';
             el.style.fontWeight = 'bold';
             el.style.pointerEvents = 'none';
             el.style.zIndex = '1000';
             el.style.transition = 'transform 0.5s ease, opacity 0.5s ease';
-            document.body.appendChild(e.clientX ? x : 0); // fallback
-            el.style.left = `${x || 200}px`;
-            el.style.top = `${y || 300}px`;
             document.body.appendChild(el);
 
             setTimeout(() => {
