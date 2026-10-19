@@ -20,6 +20,7 @@
             height: 90vh;
             user-select: none;
             -webkit-user-select: none;
+            overflow: hidden;
         }
         .header {
             font-size: 26px;
@@ -43,10 +44,9 @@
             border-radius: 50%;
             border: 5px solid #ffcc00;
             box-shadow: 0 0 30px rgba(255, 204, 0, 0.4);
-            transition: transform 0.05s ease;
-        }
-        .clicker-img:active {
-            transform: scale(0.92);
+            /* Плавный возврат картинки в исходное положение */
+            transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform-origin: center center;
         }
         .stats {
             font-size: 18px;
@@ -75,15 +75,14 @@
             tg.expand();
         }
 
-        // Загружаем сохраненный счет из памяти телефона
         let score = parseInt(localStorage.getItem('rykov_score')) || 0;
         let energy = 1000;
 
         const scoreElement = document.getElementById('score');
         const energyElement = document.getElementById('energy');
         const clickArea = document.getElementById('clickArea');
+        const rykovImage = document.getElementById('rykovImage');
 
-        // Сразу выводим текущий счет на экран
         scoreElement.innerText = score;
 
         clickArea.addEventListener('touchstart', handleClick);
@@ -99,9 +98,24 @@
                 scoreElement.innerText = score;
                 energyElement.innerText = energy;
 
-                // Сохраняем счет в память при каждом клике
                 localStorage.setItem('rykov_score', score);
 
+                // --- АНИМАЦИЯ ХАОТИЧНОГО ВРАЩЕНИЯ И СЖАТИЯ ---
+                // Генерация случайного угла от -35 до +35 градусов
+                const randomAngle = (Math.random() - 0.5) * 70; 
+                // Случайный сдвиг по оси X и Y
+                const randomX = (Math.random() - 0.5) * 15;
+                const randomY = (Math.random() - 0.5) * 15;
+
+                // Применяем случайный поворот, смещение и уменьшение размера
+                rykovImage.style.transform = `translate(${randomX}px, ${randomY}px) rotate(${randomAngle}deg) scale(0.92)`;
+
+                // Возвращаем в исходное состояние через короткую паузу
+                setTimeout(() => {
+                    rykovImage.style.transform = 'translate(0, 0) rotate(0deg) scale(1)';
+                }, 120);
+
+                // Координаты для анимации +1
                 let x = e.clientX || (e.touches && e.touches[0].clientX);
                 let y = e.clientY || (e.touches && e.touches[0].clientY);
 
