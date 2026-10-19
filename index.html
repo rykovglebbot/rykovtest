@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rykov Kombat</title>
-    <!-- Подключаем скрипт Telegram Web App -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         body {
@@ -63,7 +62,6 @@
     <div class="score" id="score">0</div>
 
     <div class="clicker-container" id="clickArea">
-        <!-- Фотография персонажа -->
         <img src="rykov.jpg" alt="Rykov" class="clicker-img" id="rykovImage">
     </div>
 
@@ -73,49 +71,20 @@
 
     <script>
         const tg = window.Telegram?.WebApp;
-
-        // Инициализация WebApp внутри Telegram
         if (tg) {
             tg.expand();
         }
 
-        // Загрузка сохраненного счёта (из Telegram CloudStorage или localStorage)
-        let score = 0;
+        // Загружаем сохраненный счет из памяти телефона
+        let score = parseInt(localStorage.getItem('rykov_score')) || 0;
         let energy = 1000;
 
         const scoreElement = document.getElementById('score');
         const energyElement = document.getElementById('energy');
         const clickArea = document.getElementById('clickArea');
 
-        // Функция загрузки данных
-        function loadData() {
-            if (tg && tg.CloudStorage) {
-                tg.CloudStorage.getItem('rykov_score', (err, value) => {
-                    if (!err && value !== null) {
-                        score = parseInt(value, 10) || 0;
-                    } else {
-                        score = parseInt(localStorage.getItem('rykov_score'), 10) || 0;
-                    }
-                    scoreElement.innerText = score;
-                });
-            } else {
-                score = parseInt(localStorage.getItem('rykov_score'), 10) || 0;
-                scoreElement.innerText = score;
-            }
-        }
-
-        // Функция сохранения данных
-        function saveData() {
-            // Сохранение в Telegram CloudStorage
-            if (tg && tg.CloudStorage) {
-                tg.CloudStorage.setItem('rykov_score', score.toString());
-            }
-            // Резервное сохранение в localStorage браузера
-            localStorage.setItem('rykov_score', score.toString());
-        }
-
-        // Загружаем счёт при открытии
-        loadData();
+        // Сразу выводим текущий счет на экран
+        scoreElement.innerText = score;
 
         clickArea.addEventListener('touchstart', handleClick);
         clickArea.addEventListener('click', handleClick);
@@ -130,8 +99,8 @@
                 scoreElement.innerText = score;
                 energyElement.innerText = energy;
 
-                // Сохраняем счёт при каждом клике
-                saveData();
+                // Сохраняем счет в память при каждом клике
+                localStorage.setItem('rykov_score', score);
 
                 let x = e.clientX || (e.touches && e.touches[0].clientX);
                 let y = e.clientY || (e.touches && e.touches[0].clientY);
@@ -142,7 +111,7 @@
             }
         }
 
-        // Постепенное восстановление энергии
+        // Восстановление энергии
         setInterval(() => {
             if (energy < 1000) {
                 energy += 3;
@@ -151,7 +120,6 @@
             }
         }, 1000);
 
-        // Всплывающая анимация +1
         function showFloatingText(x, y, text) {
             const el = document.createElement('div');
             el.innerText = text;
