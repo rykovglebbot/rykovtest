@@ -62,7 +62,7 @@
     <div class="score" id="score">0</div>
 
     <div class="clicker-container" id="clickArea">
-        <!-- Указано обновленное название файла картинки -->
+        <!-- Название вашей картинки в GitHub -->
         <img src="rykov.png" alt="Rykov" class="clicker-img" id="rykovImage">
     </div>
 
@@ -76,6 +76,7 @@
             tg.expand();
         }
 
+        // Загружаем сохранённый счёт из памяти устройства
         let score = parseInt(localStorage.getItem('rykov_score')) || 0;
         let energy = 1000;
 
@@ -86,6 +87,7 @@
 
         scoreElement.innerText = score;
 
+        // Нажатие на фотографию
         clickArea.addEventListener('pointerdown', (e) => {
             if (energy > 0) {
                 score += 1;
@@ -94,9 +96,10 @@
                 scoreElement.innerText = score;
                 energyElement.innerText = energy;
 
+                // Сохраняем результат
                 localStorage.setItem('rykov_score', score);
 
-                // Хаотичный поворот и сдвиг при клике
+                // Хаотичный поворот и сдвиг
                 const randomAngle = (Math.random() - 0.5) * 70; 
                 const randomX = (Math.random() - 0.5) * 20;
                 const randomY = (Math.random() - 0.5) * 20;
@@ -107,11 +110,12 @@
                     rykovImage.style.transform = 'translate(0px, 0px) rotate(0deg) scale(1)';
                 }, 100);
 
+                // Всплывающий текст +1
                 showFloatingText(e.clientX, e.clientY, "+1");
             }
         });
 
-        // Восстановление энергии
+        // Постепенное восстановление энергии
         setInterval(() => {
             if (energy < 1000) {
                 energy += 3;
