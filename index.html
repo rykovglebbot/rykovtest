@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#121212">
+  <title>Rykov Kombat</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      background: #121212; color: #fff; font-family: Arial, sans-serif;
+      text-align: center; margin: 0; padding: 20px;
+      min-height: 100vh; min-height: 100dvh;
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: space-between; user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .header { font-size: 26px; font-weight: bold; color: #ffcc00; margin-top: 10px; }
+    .score { font-size: 48px; font-weight: bold; margin: 15px 0; }
+    .clicker-container {
+      position: relative; cursor: pointer; touch-action: manipulation;
+      display: grid; place-items: center; width: min(270px, 75vw); aspect-ratio: 1;
+      border-radius: 50%; outline: none;
+    }
+    .clicker-img {
+      width: 100%; height: 100%; object-fit: cover; border-radius: 50%;
+      border: 5px solid #ffcc00; box-shadow: 0 0 30px rgba(255,204,0,.4);
+      transition: transform .05s ease;
+    }
+    .clicker-container:active .clicker-img { transform: scale(.92); }
+    .fallback { display: none; font-size: 120px; width: 100%; height: 100%; place-items: center;
+      border-radius: 50%; border: 5px solid #ffcc00; background: #202020;
+      box-shadow: 0 0 30px rgba(255,204,0,.4); }
+    .stats { font-size: 18px; color: #aaa; margin-bottom: 20px; }
+    .floating { position: fixed; color: #ffcc00; font-size: 28px; font-weight: bold;
+      pointer-events: none; z-index: 1000; animation: float-up .6s ease-out forwards; }
+    @keyframes float-up { from { transform: translateY(0); opacity: 1; } to { transform: translateY(-60px); opacity: 0; } }
+  </style>
+</head>
+<body>
+  <div class="header">Rykov Kombat</div>
+  <div class="score" id="score">0</div>
+  <div class="clicker-container" id="clickArea" role="button" tabindex="0" aria-label="Нажимай, чтобы заработать коины">
+    <img src="rykov.jpg" alt="Rykov" class="clicker-img" id="rykovImage">
+    <div class="fallback" id="fallback" aria-hidden="true">💪</div>
+  </div>
+  <div class="stats">⚡ Энергия: <span id="energy">1000</span> / 1000</div>
+
+  <script>
+    (() => {
+      const MAX_ENERGY = 1000;
+      let score = 0;
+      let energy = MAX_ENERGY;
+      const scoreElement = document.getElementById('score');
+      const energyElement = document.getElementById('energy');
+      const clickArea = document.getElementById('clickArea');
+      const image = document.getElementById('rykovImage');
+      const fallback = document.getElementById('fallback');
+
+      if (image) {
+        image.addEventListener('error', () => {
+          image.style.display = 'none';
+          fallback.style.display = 'grid';
+        });
+      }
+
+      if (window.Telegram && window.Telegram.WebApp) {
+        window.Telegram.WebApp.ready();
+        window.Telegram.WebApp.expand();
+      }
+
+      function handleClick(event) {
+        if (energy <= 0) return;
+        score += 1;
+        energy -= 1;
+        scoreElement.textContent = score;
+        energyElement.textContent = energy;
+        const x = event.clientX || (event.changedTouches && event.changedTouches[0]?.clientX) || window.innerWidth / 2;
+        const y = event.clientY || (event.changedTouches && event.changedTouches[0]?.clientY) || window.innerHeight / 2;
+        showFloatingText(x, y, '+1');
+      }
+
+      // Pointer events work on touchscreens and with a mouse without double-counting taps.
+      clickArea.addEventListener('pointerdown', (event) => {
+        event.preventDefault();
+        handleClick(event);
+      });
+      clickArea.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          handleClick({ clientX: window.innerWidth / 2, clientY: window.innerHeight / 2 });
+        }
+      });
+
+      setInterval(() => {
+        if (energy < MAX_ENERGY) {
+          energy = Math.min(MAX_ENERGY, energy + 3);
+          energyElement.textContent = energy;
+        }
+      }, 1000);
+
+      function showFloatingText(x, y, text) {
+        const el = document.createElement('div');
+        el.className = 'floating';
+        el.textContent = text;
+        el.style.left = `${x}px`;
+        el.style.top = `${y}px`;
+        document.body.appendChild(el);
+        el.addEventListener('animationend', () => el.remove(), { once: true });
+      }
+    })();
+  </script>
+</body>
+</html>
