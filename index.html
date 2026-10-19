@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Rykov Kombat</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
@@ -36,6 +36,7 @@
         .clicker-container {
             position: relative;
             cursor: pointer;
+            touch-action: manipulation;
         }
         .clicker-img {
             width: 260px;
@@ -44,8 +45,7 @@
             border-radius: 50%;
             border: 5px solid #ffcc00;
             box-shadow: 0 0 30px rgba(255, 204, 0, 0.4);
-            /* Плавный возврат картинки в исходное положение */
-            transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: transform 0.1s ease-out;
             transform-origin: center center;
         }
         .stats {
@@ -62,7 +62,8 @@
     <div class="score" id="score">0</div>
 
     <div class="clicker-container" id="clickArea">
-        <img src="rykov.jpg" alt="Rykov" class="clicker-img" id="rykovImage">
+        <!-- Установлено точное имя твоего файла изображения -->
+        <img src="1000015036.jpg" alt="Rykov" class="clicker-img" id="rykovImage">
     </div>
 
     <div class="stats">
@@ -85,12 +86,8 @@
 
         scoreElement.innerText = score;
 
-        clickArea.addEventListener('touchstart', handleClick);
-        clickArea.addEventListener('click', handleClick);
-
-        function handleClick(e) {
-            if (e.type === 'touchstart') e.preventDefault();
-            
+        // Надежное событие нажатия для телефонов и ПК
+        clickArea.addEventListener('pointerdown', (e) => {
             if (energy > 0) {
                 score += 1;
                 energy -= 1;
@@ -100,30 +97,21 @@
 
                 localStorage.setItem('rykov_score', score);
 
-                // --- АНИМАЦИЯ ХАОТИЧНОГО ВРАЩЕНИЯ И СЖАТИЯ ---
-                // Генерация случайного угла от -35 до +35 градусов
+                // Хаотичный поворот и сдвиг при клике
                 const randomAngle = (Math.random() - 0.5) * 70; 
-                // Случайный сдвиг по оси X и Y
-                const randomX = (Math.random() - 0.5) * 15;
-                const randomY = (Math.random() - 0.5) * 15;
+                const randomX = (Math.random() - 0.5) * 20;
+                const randomY = (Math.random() - 0.5) * 20;
 
-                // Применяем случайный поворот, смещение и уменьшение размера
-                rykovImage.style.transform = `translate(${randomX}px, ${randomY}px) rotate(${randomAngle}deg) scale(0.92)`;
+                rykovImage.style.transform = `translate(${randomX}px, ${randomY}px) rotate(${randomAngle}deg) scale(0.9)`;
 
-                // Возвращаем в исходное состояние через короткую паузу
                 setTimeout(() => {
-                    rykovImage.style.transform = 'translate(0, 0) rotate(0deg) scale(1)';
-                }, 120);
+                    rykovImage.style.transform = 'translate(0px, 0px) rotate(0deg) scale(1)';
+                }, 100);
 
-                // Координаты для анимации +1
-                let x = e.clientX || (e.touches && e.touches[0].clientX);
-                let y = e.clientY || (e.touches && e.touches[0].clientY);
-
-                if (x && y) {
-                    showFloatingText(x, y, "+1");
-                }
+                // Всплывающий текст +1
+                showFloatingText(e.clientX, e.clientY, "+1");
             }
-        }
+        });
 
         // Восстановление энергии
         setInterval(() => {
@@ -145,15 +133,18 @@
             el.style.fontWeight = 'bold';
             el.style.pointerEvents = 'none';
             el.style.zIndex = '1000';
-            el.style.transition = 'transform 0.6s ease, opacity 0.6s ease';
+            el.style.transition = 'transform 0.5s ease, opacity 0.5s ease';
+            document.body.appendChild(e.clientX ? x : 0); // fallback
+            el.style.left = `${x || 200}px`;
+            el.style.top = `${y || 300}px`;
             document.body.appendChild(el);
 
             setTimeout(() => {
-                el.style.transform = 'translateY(-60px)';
+                el.style.transform = 'translateY(-50px)';
                 el.style.opacity = '0';
             }, 20);
 
-            setTimeout(() => el.remove(), 600);
+            setTimeout(() => el.remove(), 500);
         }
     </script>
 </body>
