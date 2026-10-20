@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+1<!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
@@ -127,9 +127,8 @@
 
         scoreElement.innerText = score;
 
-        // Создаем объект звука и переменную для таймера
+        // Создаем объект звука
         const clickSound = new Audio('ai.mp3');
-        let soundTimeout = null;
 
         // Клик по персонажу
         clickArea.addEventListener('pointerdown', (e) => {
@@ -142,19 +141,14 @@
 
                 localStorage.setItem('rykov_score', score);
 
-                // Логика воспроизведения ровно 1 секунды звука
-                clickSound.currentTime = 0; // Сбрасываем звук в начало
-                clickSound.play().catch(error => {
-                    console.log("Ошибка воспроизведения звука:", error);
-                });
-
-                // Очищаем предыдущий таймер, если кликают слишком быстро
-                if (soundTimeout) clearTimeout(soundTimeout);
-
-                // Останавливаем звук через 1000 миллисекунд (1 секунду)
-                soundTimeout = setTimeout(() => {
-                    clickSound.pause();
-                }, 1000);
+                // Если звук сейчас не играет, запускаем его с начала. 
+                // Если он уже играет, он просто продолжает звучать дальше без сброса и рывков.
+                if (clickSound.paused) {
+                    clickSound.currentTime = 0;
+                    clickSound.play().catch(error => {
+                        console.log("Ошибка воспроизведения звука:", error);
+                    });
+                }
 
                 // Эффект сжатия и поворота
                 const randomAngle = (Math.random() - 0.5) * 70; 
@@ -197,7 +191,7 @@
             }
         }, 1000);
 
-        function showFloatingText(x, y, text) {
+        function showFloatingTest(x, y, text) {
             const el = document.createElement('div');
             el.innerText = text;
             el.style.position = 'fixed';
