@@ -95,7 +95,7 @@
 
     <div class="clicker-container" id="clickArea">
         <!-- Убедись, что картинка называется rykov.png -->
-        <img src="rykov.png" alt="Rykov" class="clicker-img" id="rykovImage">
+        <img src="tel.png" alt="tel" class="clicker-img" id="telImage">
     </div>
 
     <div class="stats">
@@ -155,10 +155,10 @@
                 const randomX = (Math.random() - 0.5) * 20;
                 const randomY = (Math.random() - 0.5) * 20;
 
-                rykovImage.style.transform = `translate(${randomX}px, ${randomY}px) rotate(${randomAngle}deg) scale(0.9)`;
+                telImage.style.transform = `translate(${randomX}px, ${randomY}px) rotate(${randomAngle}deg) scale(0.9)`;
 
                 setTimeout(() => {
-                    rykovImage.style.transform = 'translate(0px, 0px) rotate(0deg) scale(1)';
+                    telImage.style.transform = 'translate(0px, 0px) rotate(0deg) scale(1)';
                 }, 100);
 
                 showFloatingText(e.clientX, e.clientY, "+1");
