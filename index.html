@@ -1,4 +1,4 @@
-1<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
@@ -53,38 +53,6 @@
             color: #aaaaaa;
             margin: 10px 0;
         }
-        /* Админ-панель для рассылки */
-        .admin-panel {
-            background: #1e1e1e;
-            padding: 12px;
-            border-radius: 12px;
-            border: 1px solid #ffcc00;
-            width: 90%;
-            max-width: 320px;
-            margin-top: 10px;
-        }
-        .admin-panel input {
-            width: 85%;
-            padding: 8px;
-            border-radius: 6px;
-            border: none;
-            outline: none;
-            margin-bottom: 8px;
-            background: #2a2a2a;
-            color: #fff;
-            text-align: center;
-            font-size: 14px;
-        }
-        .admin-panel button {
-            background: #ffcc00;
-            color: #000;
-            border: none;
-            padding: 8px 18px;
-            border-radius: 6px;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 14px;
-        }
     </style>
 </head>
 <body>
@@ -94,20 +62,11 @@
     <div class="score" id="score">0</div>
 
     <div class="clicker-container" id="clickArea">
-        <!-- Убедись, что картинка называется rykov.png -->
-        <img src="tel.png" alt="tel" class="clicker-img" id="telImage">
+        <img src="tel.png" alt="Telifon" class="clicker-img" id="telImage">
     </div>
 
     <div class="stats">
         ⚡ Энергия: <span id="energy">1000</span> / 1000
-    </div>
-
-    <!-- Панель администратора для рассылки -->
-    <div class="admin-panel">
-        <div style="font-size: 12px; color: #ffcc00; margin-bottom: 5px;">👑 Панель рассылки</div>
-        <input type="text" id="broadcastInput" placeholder="Текст сообщения для всех...">
-        <br>
-        <button onclick="sendBroadcast()">Отправить всем</button>
     </div>
 
     <script>
@@ -117,7 +76,7 @@
         }
 
         // Загружаем сохраненный счет
-        let score = parseInt(localStorage.getItem('tel_score')) || 0;
+        let score = parseInt(localStorage.getItem('telifon_score')) || 0;
         let energy = 1000;
 
         const scoreElement = document.getElementById('score');
@@ -127,7 +86,7 @@
 
         scoreElement.innerText = score;
 
-        // Создаем объект звука
+        // Объект аудиофайла ai.mp3
         const clickSound = new Audio('ai.mp3');
 
         // Клик по персонажу
@@ -139,10 +98,9 @@
                 scoreElement.innerText = score;
                 energyElement.innerText = energy;
 
-                localStorage.setItem('tel_score', score);
+                localStorage.setItem('telifon_score', score);
 
-                // Если звук сейчас не играет, запускаем его с начала. 
-                // Если он уже играет, он просто продолжает звучать дальше без сброса и рывков.
+                // Воспроизведение звука ai.mp3 без заикания
                 if (clickSound.paused) {
                     clickSound.currentTime = 0;
                     clickSound.play().catch(error => {
@@ -165,23 +123,6 @@
             }
         });
 
-        // Функция отправки рассылки боту из игры
-        function sendBroadcast() {
-            const input = document.getElementById('broadcastInput');
-            const text = input.value.trim();
-            
-            if (!text) {
-                alert('Введите текст сообщения!');
-                return;
-            }
-
-            if (tg && tg.sendData) {
-                tg.sendData(text);
-            } else {
-                alert('Функция доступна только внутри Telegram Mini App!');
-            }
-        }
-
         // Восстановление энергии
         setInterval(() => {
             if (energy < 1000) {
@@ -191,7 +132,7 @@
             }
         }, 1000);
 
-        function showFloatingTest(x, y, text) {
+        function showFloatingText(x, y, text) {
             const el = document.createElement('div');
             el.innerText = text;
             el.style.position = 'fixed';
