@@ -123,7 +123,7 @@
         const scoreElement = document.getElementById('score');
         const energyElement = document.getElementById('energy');
         const clickArea = document.getElementById('clickArea');
-        const rykovImage = document.getElementById('rykovImage');
+        const telImage = document.getElementById('telImage');
 
         scoreElement.innerText = score;
 
@@ -139,7 +139,7 @@
                 scoreElement.innerText = score;
                 energyElement.innerText = energy;
 
-                localStorage.setItem('rykov_score', score);
+                localStorage.setItem('tel_score', score);
 
                 // Если звук сейчас не играет, запускаем его с начала. 
                 // Если он уже играет, он просто продолжает звучать дальше без сброса и рывков.
