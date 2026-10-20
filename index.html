@@ -94,7 +94,7 @@
     <div class="score" id="score">0</div>
 
     <div class="clicker-container" id="clickArea">
-        <!-- Убедись, что картинка на GitHub называется именно rykov.png -->
+        <!-- Убедись, что картинка называется rykov.png -->
         <img src="rykov.png" alt="Rykov" class="clicker-img" id="rykovImage">
     </div>
 
@@ -102,7 +102,7 @@
         ⚡ Энергия: <span id="energy">1000</span> / 1000
     </div>
 
-    <!-- Панель администратора (для отправки рассылки через бота) -->
+    <!-- Панель администратора для рассылки -->
     <div class="admin-panel">
         <div style="font-size: 12px; color: #ffcc00; margin-bottom: 5px;">👑 Панель рассылки</div>
         <input type="text" id="broadcastInput" placeholder="Текст сообщения для всех...">
@@ -127,6 +127,10 @@
 
         scoreElement.innerText = score;
 
+        // Создаем объект звука и переменную для таймера
+        const clickSound = new Audio('ai.mp3');
+        let soundTimeout = null;
+
         // Клик по персонажу
         clickArea.addEventListener('pointerdown', (e) => {
             if (energy > 0) {
@@ -137,6 +141,20 @@
                 energyElement.innerText = energy;
 
                 localStorage.setItem('rykov_score', score);
+
+                // Логика воспроизведения ровно 1 секунды звука
+                clickSound.currentTime = 0; // Сбрасываем звук в начало
+                clickSound.play().catch(error => {
+                    console.log("Ошибка воспроизведения звука:", error);
+                });
+
+                // Очищаем предыдущий таймер, если кликают слишком быстро
+                if (soundTimeout) clearTimeout(soundTimeout);
+
+                // Останавливаем звук через 1000 миллисекунд (1 секунду)
+                soundTimeout = setTimeout(() => {
+                    clickSound.pause();
+                }, 1000);
 
                 // Эффект сжатия и поворота
                 const randomAngle = (Math.random() - 0.5) * 70; 
@@ -164,7 +182,7 @@
             }
 
             if (tg && tg.sendData) {
-                tg.sendData(text); // Передает текст в Python-бот, который сделает рассылку
+                tg.sendData(text);
             } else {
                 alert('Функция доступна только внутри Telegram Mini App!');
             }
